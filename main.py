@@ -89,7 +89,7 @@ joblib.dump(risk_profiles, os.path.join(base_dir, 'cluster_outputs', 'RiskProfil
 
 unique_PatientIDs = [item[0] for item in risk_profiles]
 df = pd.DataFrame([item[1] for item in risk_profiles]).ffill(axis=1)
-model = KMeans(n_clusters=2)
+model = KMeans(n_clusters=2, verbose = 1)
 model.fit(df)
 predictions = model.predict(df)
 
