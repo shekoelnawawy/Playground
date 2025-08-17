@@ -1,4 +1,3 @@
-import csv
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
@@ -6,82 +5,57 @@ import numpy as np
 import joblib
 from sklearn.cluster import KMeans
 import os
-
 import warnings
+
 warnings.filterwarnings("ignore")
 
-base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data/outputs'
+most_vulnerable_threshold = 25
+
+# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
+base_dir = '/home/mnawawy/Sepsis'
 training_sets = ['training_setA', 'training_setB']
+os.makedirs(os.path.join(base_dir,'cluster_outputs'), exist_ok=True)
 
-# benign_files = []
-adversarial_files = []
-
-# get features
-columns_file = open('/Users/nawawy/Desktop/Research/Sepsis_data/physionet.org/files/challenge-2019/1.0.0/training/training_setA/p000001.psv', 'r')
-header = columns_file.readline().strip()
+# get feature names
+f = open(os.path.join(base_dir,'inputs/training_setA/p000001.psv'), 'r')
+header = f.readline().strip()
 features = np.array(header.split('|')[:-1])
-columns_file.close()
+f.close()
 
-
-# benign_df = pd.DataFrame()
-adversarial_df = pd.DataFrame()
-
+adversarial_data_df = pd.DataFrame()
+adversarial_predictions_df = pd.DataFrame()
+i=0
 for training_set in training_sets:
-    # benign_path = os.path.join(base_dir, training_set, 'Data', 'Benign')
-    adversarial_path = os.path.join(base_dir, training_set, 'Data', 'Adversarial')
-    for f in os.listdir(adversarial_path):
-        # if os.path.isfile(os.path.join(benign_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
-        #     benign_data = joblib.load(os.path.join(benign_path, f))
-        #     benign_patient_df = pd.DataFrame(benign_data)
-        #     benign_patient_df.columns = features
-        #     benign_patient_df.insert(loc=0, column='PatientID', value=f[:-4])
-        #     benign_df = pd.concat([benign_df, benign_patient_df], axis=0, ignore_index=True)
-        # else:
-        #     raise Exception('Benign data file does not exist!')
-
-        if os.path.isfile(os.path.join(adversarial_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
-            adversarial_data = joblib.load(os.path.join(adversarial_path, f))
+    adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Adversarial')
+    adversarial_predictions_path = os.path.join(base_dir, 'outputs', training_set, 'Predictions', 'Adversarial')
+    for f in os.listdir(adversarial_data_path):
+        if os.path.isfile(os.path.join(adversarial_data_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
+            adversarial_data = joblib.load(os.path.join(adversarial_data_path, f))
             adversarial_patient_df = pd.DataFrame(adversarial_data)
             adversarial_patient_df.columns = features
             adversarial_patient_df.insert(loc=0, column='PatientID', value=f[:-4])
-            adversarial_df = pd.concat([adversarial_df, adversarial_patient_df], axis=0, ignore_index=True)
+            adversarial_data_df = pd.concat([adversarial_data_df, adversarial_patient_df], axis=0, ignore_index=True)
         else:
             raise Exception('Adversarial data file does not exist!')
 
-
-# adversarial_data = joblib.load('/Users/nawawy/Desktop/Research/Old/MortalityData/True/adversarial_data.pkl')
-# adversarial_output = joblib.load('/Users/nawawy/Desktop/Research/Old/MortalityData/True/adversarial_output.pkl')
-# benign_output = joblib.load('/Users/nawawy/Desktop/Research/Old/MortalityData/False/benign_output.pkl')
-# print('adversarial_data')
-# print(adversarial_data)
-# print(adversarial_data.shape)
-# print(type(adversarial_data))
-# print('---------------------------------------------')
-
-
-# most_vulnerable = []
-# for i in range(len(benign_output)):
-#     if adversarial_output[i] >= 0.5 and benign_output[i] < 0.5:
-#         most_vulnerable.append(i)
-#
-# joblib.dump(most_vulnerable, './MostVulnerablePatientIDs.pkl')
-
-
-features = np.insert(features,0,"PatientID")
-
+        predictions_f = f[:-4] + '.psv'
+        if os.path.isfile(os.path.join(adversarial_predictions_path, predictions_f)) and not predictions_f.lower().startswith('.') and predictions_f.lower().endswith('psv'):
+            adversarial_predictions_file = open(os.path.join(adversarial_predictions_path, predictions_f), 'r')
+            header = adversarial_predictions_file.readline().strip()
+            adversarial_patient_df = pd.DataFrame(np.loadtxt(adversarial_predictions_file, delimiter='|')[:, 1])
+            adversarial_predictions_df = pd.concat([adversarial_predictions_df, adversarial_patient_df], axis=0, ignore_index=True)
+        else:
+            raise Exception('Adversarial prediction file does not exist!')
+        if i == 1:
+            break
+        i+=1
+    break
 # pre-processing
-# adversarial_data = adversarial_data.reshape(-1, 72 * 432)
-# print('adversarial_data')
-# print(adversarial_data)
-# print(adversarial_data.shape)
-# print(type(adversarial_data))
-# print('---------------------------------------------')
-# exit(1)
-adversarial_df = preprocessing.normalize(adversarial_df)
-print(adversarial_df)
-exit(1)
+PatientIDs = adversarial_data_df['PatientID']
+selected_features = ['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'Age', 'Gender']
+adversarial_data = np.array(adversarial_data_df.loc[:, selected_features])
 adversarial_data = preprocessing.normalize(adversarial_data)
-adversarial_output = adversarial_output >= 0.5
+adversarial_output = np.array(adversarial_predictions_df)
 
 # logistic regression for feature importance
 # define dataset
@@ -94,29 +68,41 @@ model.fit(X, y)
 # get importance
 importance = model.coef_[0]
 
-timeseries = importance*adversarial_data
-timeseries = timeseries.reshape(-1, 72, 432)
+timeseries = abs(importance*adversarial_data)
 
 risk_profiles = []
-features = [143, 83, 89, 118, 183, 114, 177, 47, 75, 100]
+risk_scores = []
+old_PatientID = PatientIDs[0]
+for j in range(len(timeseries)):
+    if PatientIDs[j] == old_PatientID:
+        risk_scores.append(float(sum(timeseries[j,:])))
+        if j == len(timeseries)-1:
+            risk_profiles.append((old_PatientID, risk_scores))
+    else:
+        risk_profiles.append((old_PatientID, risk_scores))
+        old_PatientID = PatientIDs[j]
+        risk_scores = []
+        risk_scores.append(float(sum(timeseries[j,:])))
 
-for i in range(len(timeseries)):
-    df = pd.DataFrame(timeseries[i])
-    risk_profiles.append(df[features].to_numpy().reshape(72*len(features)))
+joblib.dump(risk_profiles, os.path.join(base_dir, 'cluster_outputs', 'RiskProfiles.pkl'))
 
-df = pd.DataFrame(risk_profiles)
-joblib.dump(df, 'RiskProfiles.pkl')
+unique_PatientIDs = [item[0] for item in risk_profiles]
+df = pd.DataFrame([item[1] for item in risk_profiles]).ffill(axis=1)
 model = KMeans(n_clusters=2)
 model.fit(df)
 predictions = model.predict(df)
+
+mispredictions = pd.read_csv(os.path.join(base_dir, 'outputs/percentage_mispredictions.csv'))
+most_vulnerable = mispredictions[mispredictions['PercentageMisprediction']>most_vulnerable_threshold]['PatientID'].tolist()
+joblib.dump(most_vulnerable, os.path.join(base_dir, 'cluster_outputs', 'MostVulnerablePatientIDs.pkl'))
 
 clusterA = []
 clusterB = []
 for i in range(len(predictions)):
     if predictions[i] == 0:
-        clusterA.append(i)
+        clusterA.append(unique_PatientIDs[i])
     else:
-        clusterB.append(i)
+        clusterB.append(unique_PatientIDs[i])
 
 countA = 0
 countB = 0
@@ -131,13 +117,14 @@ print('Cluster A Patients: '+str(len(clusterA)))
 print('Cluster B Patients: '+str(len(clusterB)))
 print('Most Vulnerable in Cluster A: '+str(countA))
 print('Most Vulnerable in Cluster B: '+str(countB))
-print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
-print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
+if countA+countB != 0:
+    print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
+    print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
 
 if countA > countB:
-    joblib.dump(clusterA, './MoreVulnerablePatientIDs.pkl')
-    joblib.dump(clusterB, './LessVulnerablePatientIDs.pkl')
+    joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'MoreVulnerablePatientIDs.pkl'))
+    joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'LessVulnerablePatientIDs.pkl'))
 else:
-    joblib.dump(clusterA, './LessVulnerablePatientIDs.pkl')
-    joblib.dump(clusterB, './MoreVulnerablePatientIDs.pkl')
-joblib.dump(list(range(0,len(predictions))), './AllPatientIDs.pkl')
+    joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'LessVulnerablePatientIDs.pkl'))
+    joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'MoreVulnerablePatientIDs.pkl'))
+joblib.dump(mispredictions['PatientID'].tolist(), os.path.join(base_dir, 'cluster_outputs', 'AllPatientIDs.pkl'))
