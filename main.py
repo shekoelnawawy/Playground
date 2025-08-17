@@ -29,7 +29,7 @@ adversarial_predictions_df = pd.DataFrame()
 for training_set in tqdm(training_sets):
     adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Adversarial')
     adversarial_predictions_path = os.path.join(base_dir, 'outputs', training_set, 'Predictions', 'Adversarial')
-    for f in os.listdir(adversarial_data_path):
+    for f in tqdm(os.listdir(adversarial_data_path)):
         if os.path.isfile(os.path.join(adversarial_data_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
             adversarial_data = joblib.load(os.path.join(adversarial_data_path, f))
             adversarial_patient_df = pd.DataFrame(adversarial_data)
