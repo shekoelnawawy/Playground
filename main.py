@@ -24,7 +24,7 @@ f.close()
 
 adversarial_data_df = pd.DataFrame()
 adversarial_predictions_df = pd.DataFrame()
-i=0
+# i=0
 for training_set in training_sets:
     adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Adversarial')
     adversarial_predictions_path = os.path.join(base_dir, 'outputs', training_set, 'Predictions', 'Adversarial')
@@ -46,10 +46,10 @@ for training_set in training_sets:
             adversarial_predictions_df = pd.concat([adversarial_predictions_df, adversarial_patient_df], axis=0, ignore_index=True)
         else:
             raise Exception('Adversarial prediction file does not exist!')
-        if i == 1:
-            break
-        i+=1
-    break
+    #     if i == 1:
+    #         break
+    #     i+=1
+    # break
 # pre-processing
 PatientIDs = adversarial_data_df['PatientID']
 selected_features = ['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'Age', 'Gender']
