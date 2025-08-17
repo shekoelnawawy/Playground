@@ -26,7 +26,7 @@ f.close()
 adversarial_data_df = pd.DataFrame()
 adversarial_predictions_df = pd.DataFrame()
 # i=0
-for training_set in tqdm(training_sets):
+for training_set in training_sets:
     adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Adversarial')
     adversarial_predictions_path = os.path.join(base_dir, 'outputs', training_set, 'Predictions', 'Adversarial')
     for f in tqdm(os.listdir(adversarial_data_path)):
