@@ -113,7 +113,7 @@ for i in range(len(most_vulnerable)):
     elif most_vulnerable[i] in clusterB:
         countB += 1
 
-summary_file = open(os.path.join(base_dir,'cluster_outputs'), 'w')
+summary_file = open(os.path.join(base_dir,'cluster_outputs','summary.txt'), 'w')
 
 print('Cluster A Patients: '+str(len(clusterA)))
 print('Cluster B Patients: '+str(len(clusterB)))
