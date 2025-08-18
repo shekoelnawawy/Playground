@@ -113,14 +113,26 @@ for i in range(len(most_vulnerable)):
     elif most_vulnerable[i] in clusterB:
         countB += 1
 
+summary_file = open(os.path.join(base_dir,'cluster_outputs'), 'w')
 
 print('Cluster A Patients: '+str(len(clusterA)))
 print('Cluster B Patients: '+str(len(clusterB)))
 print('Most Vulnerable in Cluster A: '+str(countA))
 print('Most Vulnerable in Cluster B: '+str(countB))
+
+summary_file.write('Cluster A Patients: '+str(len(clusterA))+'\n')
+summary_file.write('Cluster B Patients: '+str(len(clusterB))+'\n')
+summary_file.write('Most Vulnerable in Cluster A: '+str(countA)+'\n')
+summary_file.write('Most Vulnerable in Cluster B: '+str(countB)+'\n')
+
 if countA+countB != 0:
     print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
     print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
+
+    summary_file.write('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100)+'\n')
+    summary_file.write('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100)+'\n')
+
+summary_file.close()
 
 if countA > countB:
     joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'MoreVulnerablePatientIDs.pkl'))
