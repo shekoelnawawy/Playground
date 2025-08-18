@@ -69,7 +69,7 @@ model.fit(X, y)
 # get importance
 importance = model.coef_[0]
 
-timeseries = abs(importance*adversarial_data)
+timeseries = importance*adversarial_data
 
 risk_profiles = []
 risk_scores = []
