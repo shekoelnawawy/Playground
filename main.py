@@ -25,7 +25,7 @@ adversarial_data_df = pd.DataFrame()
 adversarial_predictions_df = pd.DataFrame()
 # i=0
 for training_set in training_sets:
-    adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Adversarial')
+    adversarial_data_path = os.path.join(base_dir, 'outputs', training_set, 'Data', 'Benign')
     adversarial_predictions_path = os.path.join(base_dir, 'outputs', training_set, 'Predictions', 'Adversarial')
     for f in tqdm(os.listdir(adversarial_data_path)):
         if os.path.isfile(os.path.join(adversarial_data_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
