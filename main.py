@@ -85,6 +85,7 @@ for j in range(len(timeseries)):
         risk_scores = []
         risk_scores.append(float(sum(timeseries[j,:])))
 
+
 joblib.dump(risk_profiles, os.path.join(base_dir, 'cluster_outputs', 'RiskProfiles.pkl'))
 
 unique_PatientIDs = [item[0] for item in risk_profiles]
@@ -94,50 +95,58 @@ model.fit(df)
 predictions = model.predict(df)
 
 mispredictions = pd.read_csv(os.path.join(base_dir, 'outputs/percentage_mispredictions.csv'))
-most_vulnerable = mispredictions[mispredictions['PercentageMisprediction']>most_vulnerable_threshold]['PatientID'].tolist()
-joblib.dump(most_vulnerable, os.path.join(base_dir, 'cluster_outputs', 'MostVulnerablePatientIDs.pkl'))
-
-clusterA = []
-clusterB = []
-for i in range(len(predictions)):
-    if predictions[i] == 0:
-        clusterA.append(unique_PatientIDs[i])
-    else:
-        clusterB.append(unique_PatientIDs[i])
-
-countA = 0
-countB = 0
-for i in range(len(most_vulnerable)):
-    if most_vulnerable[i] in clusterA:
-        countA += 1
-    elif most_vulnerable[i] in clusterB:
-        countB += 1
-
-summary_file = open(os.path.join(base_dir,'cluster_outputs','summary.txt'), 'w')
-
-print('Cluster A Patients: '+str(len(clusterA)))
-print('Cluster B Patients: '+str(len(clusterB)))
-print('Most Vulnerable in Cluster A: '+str(countA))
-print('Most Vulnerable in Cluster B: '+str(countB))
-
-summary_file.write('Cluster A Patients: '+str(len(clusterA))+'\n')
-summary_file.write('Cluster B Patients: '+str(len(clusterB))+'\n')
-summary_file.write('Most Vulnerable in Cluster A: '+str(countA)+'\n')
-summary_file.write('Most Vulnerable in Cluster B: '+str(countB)+'\n')
-
-if countA+countB != 0:
-    print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
-    print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
-
-    summary_file.write('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100)+'\n')
-    summary_file.write('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100)+'\n')
-
-summary_file.close()
-
-if countA > countB:
-    joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'MoreVulnerablePatientIDs.pkl'))
-    joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'LessVulnerablePatientIDs.pkl'))
-else:
-    joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'LessVulnerablePatientIDs.pkl'))
-    joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'MoreVulnerablePatientIDs.pkl'))
 joblib.dump(mispredictions['PatientID'].tolist(), os.path.join(base_dir, 'cluster_outputs', 'AllPatientIDs.pkl'))
+aggregated_summary_file = open(os.path.join(base_dir,'cluster_outputs','aggregated_summary.csv'), 'w')
+aggregated_summary_file.write('Threshold,PercentageA,PercentageB\n')
+
+for most_vulnerable_threshold in range(5, 100, 5):
+    os.makedirs(os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold)), exist_ok=True)
+    most_vulnerable = mispredictions[mispredictions['PercentageMisprediction']>most_vulnerable_threshold]['PatientID'].tolist()
+    joblib.dump(most_vulnerable, os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold), 'MostVulnerablePatientIDs.pkl'))
+
+    clusterA = []
+    clusterB = []
+    for i in range(len(predictions)):
+        if predictions[i] == 0:
+            clusterA.append(unique_PatientIDs[i])
+        else:
+            clusterB.append(unique_PatientIDs[i])
+
+    countA = 0
+    countB = 0
+    for i in range(len(most_vulnerable)):
+        if most_vulnerable[i] in clusterA:
+            countA += 1
+        elif most_vulnerable[i] in clusterB:
+            countB += 1
+
+    threshold_summary_file = open(os.path.join(base_dir, 'cluster_outputs', 'threshold_' + str(most_vulnerable_threshold), 'threshold_summary.txt'), 'w')
+
+    print('Cluster A Patients: '+str(len(clusterA)))
+    print('Cluster B Patients: '+str(len(clusterB)))
+    print('Most Vulnerable in Cluster A: '+str(countA))
+    print('Most Vulnerable in Cluster B: '+str(countB))
+
+    threshold_summary_file.write('Cluster A Patients: ' + str(len(clusterA)) + '\n')
+    threshold_summary_file.write('Cluster B Patients: ' + str(len(clusterB)) + '\n')
+    threshold_summary_file.write('Most Vulnerable in Cluster A: ' + str(countA) + '\n')
+    threshold_summary_file.write('Most Vulnerable in Cluster B: ' + str(countB) + '\n')
+
+    if countA+countB != 0:
+        print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
+        print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
+
+        threshold_summary_file.write('Percentage of Most Vulnerable in Cluster A: ' + str((countA / (countA + countB)) * 100) + '\n')
+        threshold_summary_file.write('Percentage of Most Vulnerable in Cluster B: ' + str((countB / (countA + countB)) * 100) + '\n')
+        aggregated_summary_file.write(str(most_vulnerable_threshold)+','+str((countA / (countA + countB)) * 100)+','+str((countB / (countA + countB)) * 100)+'\n')
+
+    threshold_summary_file.close()
+
+    if countA > countB:
+        joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold), 'MoreVulnerablePatientIDs.pkl'))
+        joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold), 'LessVulnerablePatientIDs.pkl'))
+    else:
+        joblib.dump(clusterA, os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold), 'LessVulnerablePatientIDs.pkl'))
+        joblib.dump(clusterB, os.path.join(base_dir, 'cluster_outputs', 'threshold_'+str(most_vulnerable_threshold), 'MoreVulnerablePatientIDs.pkl'))
+
+aggregated_summary_file.close()
