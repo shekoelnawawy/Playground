@@ -52,6 +52,8 @@ for training_set in training_sets:
 # pre-processing
 PatientIDs = adversarial_data_df['PatientID']
 selected_features = ['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'Age', 'Gender']
+adversarial_data_df = adversarial_data_df.ffill()
+adversarial_data_df = adversarial_data_df.fillna(0)
 adversarial_data = np.array(adversarial_data_df.loc[:, selected_features])
 adversarial_data = preprocessing.normalize(adversarial_data)
 adversarial_output = np.array(adversarial_predictions_df)
