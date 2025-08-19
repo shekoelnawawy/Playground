@@ -10,8 +10,6 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
-most_vulnerable_threshold = 25
-
 # base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
 base_dir = '/home/mnawawy/Sepsis'
 training_sets = ['training_setA', 'training_setB']
