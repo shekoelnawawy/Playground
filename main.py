@@ -35,7 +35,7 @@ i=0
 for training_set in training_sets:
     benign_data_path = os.path.join(base_dir, 'results', 'attack_outputs', training_set, 'Data', 'Benign')
     adversarial_data_path = os.path.join(base_dir, 'results', 'attack_outputs', training_set, 'Data', 'Adversarial')
-    adversarial_predictions_path = os.path.join(base_dir, 'results', 'attack_outputs', training_set, 'Predictions', 'Adversarial')
+    # adversarial_predictions_path = os.path.join(base_dir, 'results', 'attack_outputs', training_set, 'Predictions', 'Adversarial')
     for f in tqdm(os.listdir(benign_data_path)):
         if os.path.isfile(os.path.join(benign_data_path, f)) and not f.lower().startswith('.') and f.lower().endswith('pkl'):
             benign_data = joblib.load(os.path.join(benign_data_path, f))
@@ -86,7 +86,9 @@ row_diff = (benign_data != adversarial_data).any(axis=1)
 # Insert row_diff into df2 at the last column position
 adversarial_data.insert(len(adversarial_data.columns), "Adversarial", row_diff)
 
+print(benign_data)
 
+print(adversarial_data)
 
 
 
