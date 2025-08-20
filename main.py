@@ -12,12 +12,13 @@ from tqdm import tqdm
 
 warnings.filterwarnings('ignore')
 
-base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
-output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
-data_path = os.path.join(base_dir, 'Defenses', 'Data')
+base_dir = '/home/mnawawy/Sepsis'
+# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
+# output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
+# data_path = os.path.join(base_dir, 'Defenses', 'Data')
 
 training_sets = ['training_setA', 'training_setB']
-os.makedirs(output_path, exist_ok=True)
+# os.makedirs(output_path, exist_ok=True)
 
 
 # get feature names
@@ -85,7 +86,7 @@ row_diff = (benign_data != adversarial_data).any(axis=1)
 # Insert row_diff into df2 at the last column position
 adversarial_data.insert(len(adversarial_data.columns), "Adversarial", row_diff)
 
-print(adversarial_data)
+
 
 
 
