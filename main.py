@@ -1,5 +1,5 @@
 import os
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import OneClassSVM
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 from sklearn.model_selection import KFold, train_test_split
 import numpy as np
@@ -14,12 +14,12 @@ warnings.filterwarnings('ignore')
 
 base_dir = '/home/mnawawy/Sepsis'
 # base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
-output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
+output_path = os.path.join(base_dir, 'Defenses', 'ResultsOneClassSVM')
 
 
 AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
 
-neigh = KNeighborsClassifier(n_neighbors=3)
+clf = OneClassSVM(gamma='scale', kernel='linear', verbose=True)
 
 
 AllPatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'AllPatientIDs.pkl'))
@@ -52,9 +52,11 @@ for run in range(5):
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
-    neigh.fit(train_x, train_y)
+    clf.fit(train_x, train_y)
 
-    lst = neigh.predict(test_x)
+    lst = clf.predict(test_x)
+    lst[lst == 1] = 0
+    lst[lst == -1] = 1
 
     Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
     Precision.insert(len(Precision), precision_score(test_y, lst))
@@ -92,9 +94,11 @@ for train_indices, test_indices in kf.split(AllPatientIDs):
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
-    neigh.fit(train_x, train_y)
+    clf.fit(train_x, train_y)
 
-    lst = neigh.predict(test_x)
+    lst = clf.predict(test_x)
+    lst[lst == 1] = 0
+    lst[lst == -1] = 1
 
     Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
     Precision.insert(len(Precision), precision_score(test_y, lst))
@@ -125,11 +129,11 @@ Recall = []
 F1 = []
 
 # train = AllPatientsData[MoreVulnerablePatientIDs]
-train = AllPatientsData[AllPatientsData['PatientID'].isin(random.sample(MoreVulnerablePatientIDs, 1000))].drop(columns=['PatientID']).to_numpy()
+train = AllPatientsData[AllPatientsData['PatientID'].isin(MoreVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
 
-neigh.fit(train_x, train_y)
+clf.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('More\tCV: ' + str(cv))
@@ -137,7 +141,9 @@ for train_indices, test_indices in kf.split(AllPatientIDs):
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
-    lst = neigh.predict(test_x)
+    lst = clf.predict(test_x)
+    lst[lst == 1] = 0
+    lst[lst == -1] = 1
 
     Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
     Precision.insert(len(Precision), precision_score(test_y, lst))
@@ -171,7 +177,7 @@ train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientI
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
 
-neigh.fit(train_x, train_y)
+clf.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('Less\tCV: ' + str(cv))
@@ -179,7 +185,9 @@ for train_indices, test_indices in kf.split(AllPatientIDs):
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
-    lst = neigh.predict(test_x)
+    lst = clf.predict(test_x)
+    lst[lst == 1] = 0
+    lst[lst == -1] = 1
 
     Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
     Precision.insert(len(Precision), precision_score(test_y, lst))
