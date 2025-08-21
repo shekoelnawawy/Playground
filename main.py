@@ -84,11 +84,11 @@ F1 = []
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('All\tCV: ' + str(cv))
 
-    train = AllPatientsData[AllPatientsData['PatientID'].isin(train_indices)].drop(columns=['PatientID']).to_numpy()
+    train = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in train_indices])].drop(columns=['PatientID']).to_numpy()
     train_x = train[:, :-1]
     train_y = train[:, -1].astype(int)
 
-    test = AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']).to_numpy()
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
@@ -133,7 +133,7 @@ neigh.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('More\tCV: ' + str(cv))
-    test = AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']).to_numpy()
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
@@ -175,7 +175,7 @@ neigh.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('Less\tCV: ' + str(cv))
-    test = AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']).to_numpy()
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
