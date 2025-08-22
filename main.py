@@ -14,13 +14,19 @@ from tqdm import tqdm
 
 warnings.filterwarnings('ignore')
 
-base_dir = '/home/mnawawy/Sepsis'
-# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
+# base_dir = '/home/mnawawy/Sepsis'
+base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
 output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
 
 
 AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
-AllPatientsData = preprocessing.normalize(AllPatientsData)
+PatientIDs = AllPatientsData['PatientID']
+selected_features = ['HR', 'O2Sat', 'Temp', 'SBP', 'MAP', 'DBP', 'Resp', 'Age', 'Gender']
+AllPatientsData = np.array(AllPatientsData.loc[:, selected_features])
+AllPatientsData = preprocessing.normalize(AllPatientsData, axis=0)
+AllPatientsData = pd.DataFrame(AllPatientsData, columns=selected_features)
+AllPatientsData.insert(0, "PatientID", PatientIDs)
+
 neigh = KNeighborsClassifier(n_neighbors=3)
 
 
