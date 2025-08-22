@@ -33,7 +33,7 @@ LessVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluste
 os.makedirs(os.path.join(output_path, 'SamplesTraining'), exist_ok=True)
 results = open(os.path.join(output_path, 'SamplesTraining', 'Results.csv'), 'w')
 results.write('Run,Accuracy,Precision,Recall,F1\n')
-
+# dummy
 Accuracy = []
 Precision = []
 Recall = []
