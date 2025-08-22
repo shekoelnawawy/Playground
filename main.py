@@ -8,6 +8,7 @@ import random
 import warnings
 import math
 from sklearn import preprocessing
+
 import pandas as pd
 from tqdm import tqdm
 
@@ -19,7 +20,7 @@ output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
 
 
 AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
-
+AllPatientsData = preprocessing.normalize(AllPatientsData)
 neigh = KNeighborsClassifier(n_neighbors=3)
 
 
@@ -33,7 +34,7 @@ LessVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluste
 os.makedirs(os.path.join(output_path, 'SamplesTraining'), exist_ok=True)
 results = open(os.path.join(output_path, 'SamplesTraining', 'Results.csv'), 'w')
 results.write('Run,Accuracy,Precision,Recall,F1\n')
-# dummy
+
 Accuracy = []
 Precision = []
 Recall = []
@@ -45,11 +46,11 @@ for run in range(5):
     train_indices = split[0]
     test_indices = split[1][:math.floor(0.2 * len(AllPatientIDs))]
 
-    train = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin(train_indices)].drop(columns=['PatientID']))
+    train = AllPatientsData[AllPatientsData['PatientID'].isin(train_indices)].drop(columns=['PatientID']).to_numpy()
     train_x = train[:, :-1]
     train_y = train[:, -1].astype(int)
 
-    test = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']))
+    test = AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
@@ -85,11 +86,11 @@ F1 = []
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('All\tCV: ' + str(cv))
 
-    train = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in train_indices])].drop(columns=['PatientID']))
+    train = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in train_indices])].drop(columns=['PatientID']).to_numpy()
     train_x = train[:, :-1]
     train_y = train[:, -1].astype(int)
 
-    test = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']))
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
@@ -126,7 +127,7 @@ Recall = []
 F1 = []
 
 # train = AllPatientsData[MoreVulnerablePatientIDs]
-train = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin(random.sample(MoreVulnerablePatientIDs, 1000))].drop(columns=['PatientID']))
+train = AllPatientsData[AllPatientsData['PatientID'].isin(random.sample(MoreVulnerablePatientIDs, 1000))].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
 
@@ -134,7 +135,7 @@ neigh.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('More\tCV: ' + str(cv))
-    test = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']))
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
@@ -168,7 +169,7 @@ Precision = []
 Recall = []
 F1 = []
 
-train = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']))
+train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
 
@@ -176,7 +177,7 @@ neigh.fit(train_x, train_y)
 
 for train_indices, test_indices in kf.split(AllPatientIDs):
     print('Less\tCV: ' + str(cv))
-    test = preprocessing.normalize(AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']))
+    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
     test_x = test[:, :-1]
     test_y = test[:, -1].astype(int)
 
