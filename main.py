@@ -12,8 +12,8 @@ from tqdm import tqdm
 
 warnings.filterwarnings('ignore')
 
-# base_dir = '/home/mnawawy/Sepsis'
-base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
+base_dir = '/home/mnawawy/Sepsis'
+# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
 output_path = os.path.join(base_dir, 'Defenses', 'ResultsKNN')
 
 
