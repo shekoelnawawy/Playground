@@ -19,7 +19,7 @@ output_path = os.path.join(base_dir, 'Defenses', 'ResultsOneClassSVM')
 
 AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
 
-clf = OneClassSVM(gamma='scale',cache_size=4096, verbose=True, max_iter = 5000)
+clf = OneClassSVM(kernel='poly',degree=3,gamma='auto',cache_size=4096, verbose=True, max_iter = 5000)
 
 
 AllPatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'AllPatientIDs.pkl'))
