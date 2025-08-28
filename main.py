@@ -15,7 +15,7 @@ base_dir = '/home/mnawawy'
 most_vulnerable = joblib.load(os.path.join(base_dir, 'MortalityData/Data/MostVulnerablePatientIDs.pkl'))
 
 df = joblib.load(os.path.join(base_dir, 'MortalityData/Data/RiskProfiles.pkl'))
-model = KMeans(n_clusters=2)
+model = KMeans(n_clusters=2, init='random')
 model.fit(df)
 
 cluster_centers = model.cluster_centers_
