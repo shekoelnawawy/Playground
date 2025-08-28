@@ -11,6 +11,9 @@ import os
 warnings.filterwarnings("ignore")
 
 base_dir = '/home/mnawawy'
+
+most_vulnerable = joblib.load(os.path.join(base_dir, 'MortalityData/Data/MostVulnerablePatientIDs.pkl'))
+
 df = joblib.load(os.path.join(base_dir, 'MortalityData/Data/RiskProfiles.pkl'))
 model = KMeans(n_clusters=2)
 model.fit(df)
@@ -23,6 +26,34 @@ from sklearn.metrics.pairwise import euclidean_distances
 # Calculate distances between all pairs of cluster centers
 distances_matrix = euclidean_distances(cluster_centers)
 print("Distance matrix between cluster centers:\n", distances_matrix)
+
+predictions = model.predict(df)
+
+clusterA = []
+clusterB = []
+for i in range(len(predictions)):
+    if predictions[i] == 0:
+        clusterA.append(i)
+    else:
+        clusterB.append(i)
+
+countA = 0
+countB = 0
+for i in range(len(most_vulnerable)):
+    if most_vulnerable[i] in clusterA:
+        countA += 1
+    elif most_vulnerable[i] in clusterB:
+        countB += 1
+
+
+print('Cluster A Patients: '+str(len(clusterA)))
+print('Cluster B Patients: '+str(len(clusterB)))
+print('Most Vulnerable in Cluster A: '+str(countA))
+print('Most Vulnerable in Cluster B: '+str(countB))
+print('Percentage of Most Vulnerable in Cluster A: '+ str((countA/(countA+countB))*100))
+print('Percentage of Most Vulnerable in Cluster B: '+ str((countB/(countA+countB))*100))
+
+
 
 # import os
 # from sklearn.svm import OneClassSVM
