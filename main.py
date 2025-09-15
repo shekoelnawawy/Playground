@@ -50,5 +50,5 @@ for x in tqdm(itertools.permutations(numbers)):
     # print(cluster_idx)
     # print(model2.linkage)
 
-    model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb)
+    model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
     i += 1
