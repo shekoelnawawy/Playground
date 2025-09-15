@@ -55,4 +55,4 @@ for x in tqdm(itertools.permutations(numbers)):
 
     break
 print(model2.linkage)
-print(type(model2.linkage[-1]))
+print(type(model2.linkage[-1][2]))
