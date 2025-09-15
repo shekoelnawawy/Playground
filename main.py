@@ -47,7 +47,7 @@ for x in itertools.permutations(numbers):
     ds = dtw.distance_matrix_fast(ts)
     print(ds)
     print(np.sort(ds))
-    exit(1)
+
     # You can also pass keyword arguments identical to instantiate a Hierarchical object
     model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
     cluster_idx = model.fit(ts)
