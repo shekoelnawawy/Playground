@@ -36,6 +36,7 @@ for i in range(len(risk_profiles)):
 
 i=0
 dist = math.inf
+print('here')
 for x in itertools.permutations(numbers):
     ts = []
     lb = []
