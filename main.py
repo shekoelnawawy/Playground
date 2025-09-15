@@ -37,7 +37,7 @@ for i in range(len(patients_2018)+len(patients_2020)):
 
 i=0
 dist = math.inf
-for x in tqdm(itertools.permutations(numbers)):
+for x in itertools.permutations(numbers):
     ts = []
     lb = []
     for j in range(len(x)):
