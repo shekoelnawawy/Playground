@@ -56,4 +56,8 @@ for x in tqdm(itertools.permutations(numbers)):
         print('Minimum Distance so far:' + str(dist))
         model.plot(os.path.join(out_dir, "clusters.pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
 
+        clusters = model.cut(n_clusters=2)
+        print(clusters)
+
     i += 1
+
