@@ -24,7 +24,6 @@ for year in years:
         patients = patients_2020
     for patient in patients:
         instantaneous_error_path = os.path.join(data_dir, year, patient, 'instantaneous_error.pkl')
-        print(instantaneous_error_path)
         df = stats.zscore(np.array(joblib.load(instantaneous_error_path).mean(axis=1), dtype=np.double))
         timeseries.append(df)
 
