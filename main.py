@@ -104,7 +104,7 @@ for x in itertools.permutations(numbers):
         ts.append(timeseries[int(x[j])])
         lb.append(labels[int(x[j])])
 
-    ds = dtw.distance_matrix_fast(ts)
+    ds = dtw.distance_matrix_fast(ts, compact=True)
     # print(ds)
     print(max(ds))
 
