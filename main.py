@@ -53,5 +53,3 @@ for x in tqdm(itertools.permutations(numbers)):
 
     model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb)
     i += 1
-
-#     'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
