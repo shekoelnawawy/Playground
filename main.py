@@ -36,7 +36,7 @@ for i in range(len(risk_profiles)):
 
 i=0
 dist = math.inf
-print('here')
+
 for x in itertools.permutations(numbers):
     ts = []
     lb = []
@@ -44,13 +44,15 @@ for x in itertools.permutations(numbers):
         ts.append(timeseries[int(x[j])])
         lb.append(labels[int(x[j])])
 
+    print('here1')
     ds = dtw.distance_matrix_fast(ts)
     # print(ds)
-
+    print('here2')
     # You can also pass keyword arguments identical to instantiate a Hierarchical object
     model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
+    print('here3')
     cluster_idx = model.fit(ts)
-
+    print('here4')
     if model.linkage[-1][2] < dist:
         dist = model.linkage[-1][2]
         print('Minimum Distance so far:' + str(dist))
