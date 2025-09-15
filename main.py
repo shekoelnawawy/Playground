@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import joblib
 from scipy import stats
@@ -34,6 +36,7 @@ for i in range(len(patients_2018)+len(patients_2020)):
     labels.append("p"+str(i))
 
 i=0
+dist = math.inf
 for x in tqdm(itertools.permutations(numbers)):
     ts = []
     lb = []
@@ -45,14 +48,11 @@ for x in tqdm(itertools.permutations(numbers)):
     #print(ds)
 
     # You can also pass keyword arguments identical to instantiate a Hierarchical object
-    model2 = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
-    cluster_idx = model2.fit(ts)
-    # print(cluster_idx)
-    # print(model2.linkage)
+    model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
+    cluster_idx = model.fit(ts)
 
-    model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
+    if model.linkage[-1][2] < dist:
+        dist = model.linkage[-1][2]
+        model.plot(os.path.join(out_dir, "clusters.pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
+
     i += 1
-
-    break
-print(model2.linkage)
-print(model2.linkage[-1][2])
