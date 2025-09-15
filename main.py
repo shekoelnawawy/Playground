@@ -42,7 +42,7 @@ for x in itertools.permutations(numbers):
         lb.append(labels[int(x[j])])
 
     ds = dtw.distance_matrix_fast(ts, compact=True)
-    # print(ds)
+    print(ds)
     ds[np.isnan(ds)] = -1
     print(np.sort(ds))
 
