@@ -41,9 +41,8 @@ for x in itertools.permutations(numbers):
         ts.append(timeseries[int(x[j])])
         lb.append(labels[int(x[j])])
 
-    print(ts)
     ds = dtw.distance_matrix_fast(ts)
-    # print(ds)
+    print(ds)
 
     # You can also pass keyword arguments identical to instantiate a Hierarchical object
     model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
