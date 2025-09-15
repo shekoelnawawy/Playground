@@ -44,7 +44,7 @@ for x in itertools.permutations(numbers):
         ts.append(timeseries[int(x[j])])
         lb.append(labels[int(x[j])])
 
-    ds = dtw.distance_matrix_fast(ts, compact = True)
+    ds = dtw.distance_matrix_fast(ts)
     print(ds)
     print(np.sort(ds))
     exit(1)
