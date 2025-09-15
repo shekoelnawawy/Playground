@@ -54,5 +54,4 @@ for x in tqdm(itertools.permutations(numbers)):
     i += 1
 
     break
-print(model2)
-print(cluster_idx)
+print(model2.get_linkage())
