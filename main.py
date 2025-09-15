@@ -6,8 +6,8 @@ import itertools
 from tqdm import tqdm
 import os
 
-base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data/risk_profiling'
-# base_dir = '/Users/nawawy/Desktop/Research/OhioT1DM_data/risk_profiling'
+# base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data/risk_profiling'
+base_dir = '/Users/nawawy/Desktop/Research/OhioT1DM_data/risk_profiling'
 data_dir = os.path.join(base_dir, 'Data')
 out_dir = os.path.join(base_dir, 'cluster_outputs')
 os.makedirs(out_dir, exist_ok=True)
@@ -52,3 +52,7 @@ for x in tqdm(itertools.permutations(numbers)):
 
     model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
     i += 1
+
+    break
+print(model2)
+print(cluster_idx)
