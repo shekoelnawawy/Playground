@@ -14,9 +14,6 @@ data_dir = os.path.join(base_dir, 'Data')
 out_dir = os.path.join(base_dir, 'cluster_outputs')
 os.makedirs(out_dir, exist_ok=True)
 
-# years = ['2018', '2020']
-# patients_2018= ['559', '563', '570', '575', '588', '591']
-# patients_2020 = ['540', '544', '552', '567', '584', '596']
 timeseries = []
 
 
@@ -44,6 +41,7 @@ for x in itertools.permutations(numbers):
         ts.append(timeseries[int(x[j])])
         lb.append(labels[int(x[j])])
 
+    print(ts)
     ds = dtw.distance_matrix_fast(ts)
     # print(ds)
 
