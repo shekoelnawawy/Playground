@@ -1,208 +1,57 @@
-import os
-from sklearn.svm import OneClassSVM
-from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
-from sklearn.model_selection import KFold, train_test_split
 import numpy as np
 import joblib
-import random
-import warnings
-import math
-import pandas as pd
+from scipy import stats
+from dtaidistance import dtw, clustering
+import itertools
 from tqdm import tqdm
+import os
 
-warnings.filterwarnings('ignore')
+base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data/risk_profiling'
+# base_dir = '/Users/nawawy/Desktop/Research/OhioT1DM_data/risk_profiling'
+data_dir = os.path.join(base_dir, 'Data')
+out_dir = os.path.join(base_dir, 'cluster_outputs')
+os.makedirs(out_dir, exist_ok=True)
 
-base_dir = '/home/mnawawy/Sepsis'
-# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
-output_path = os.path.join(base_dir, 'Defenses', 'ResultsOneClassSVM')
+years = ['2018', '2020']
+patients_2018= ['559', '563', '570', '575', '588', '591']
+patients_2020 = ['540', '544', '552', '567', '584', '596']
+timeseries = []
 
+for year in years:
+    if year == '2018':
+        patients = patients_2018
+    else:
+        patients = patients_2020
+    for patient in patients:
+        instantaneous_error_path = os.path.join(data_dir, year, patient, 'instantaneous_error.pkl')
+        print(instantaneous_error_path)
+        df = stats.zscore(np.array(joblib.load(instantaneous_error_path).mean(axis=1), dtype=np.double))
+        timeseries.append(df)
 
-AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
+numbers = []
+labels = []
+for i in range(len(patients_2018)+len(patients_2020)):
+    numbers.append(i)
+    labels.append("p"+str(i))
 
-clf = OneClassSVM(kernel='sigmoid',degree=5,gamma='auto',cache_size=4096, verbose=True, max_iter = 1000)
+i=0
+for x in tqdm(itertools.permutations(numbers)):
+    ts = []
+    lb = []
+    for j in range(len(x)):
+        ts.append(timeseries[int(x[j])])
+        lb.append(labels[int(x[j])])
 
+    ds = dtw.distance_matrix_fast(ts)
+    #print(ds)
 
-AllPatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'AllPatientIDs.pkl'))
-MostVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_10', 'MostVulnerablePatientIDs.pkl'))
-# MoreVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_5', 'MoreVulnerablePatientIDs.pkl'))
-# LessVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_5', 'LessVulnerablePatientIDs.pkl'))
-MoreVulnerablePatientIDs = MostVulnerablePatientIDs
-LessVulnerablePatientIDs = list(set(AllPatientIDs) - set(MostVulnerablePatientIDs))
-######################################################################################################################################
-# Samples
-os.makedirs(os.path.join(output_path, 'SamplesTraining'), exist_ok=True)
-results = open(os.path.join(output_path, 'SamplesTraining', 'Results.csv'), 'w')
-results.write('Run,Accuracy,Precision,Recall,F1\n')
+    # You can also pass keyword arguments identical to instantiate a Hierarchical object
+    model2 = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
+    cluster_idx = model2.fit(ts)
+    # print(cluster_idx)
+    # print(model2.linkage)
 
-Accuracy = []
-Precision = []
-Recall = []
-F1 = []
-for run in range(5):
-    print('SamplesTraining\tTrial: ' + str(run))
+    model2.plot(os.path.join(out_dir, "hierarchy"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb)
+    i += 1
 
-    split = train_test_split(AllPatientIDs, train_size=len(LessVulnerablePatientIDs))
-    train_indices = split[0]
-    test_indices = split[1][:math.floor(0.2 * len(AllPatientIDs))]
-
-    train = AllPatientsData[AllPatientsData['PatientID'].isin(train_indices)].drop(columns=['PatientID']).to_numpy()
-    train_x = train[:, :-1]
-    train_y = train[:, -1].astype(int)
-
-    test = AllPatientsData[AllPatientsData['PatientID'].isin(test_indices)].drop(columns=['PatientID']).to_numpy()
-    test_x = test[:, :-1]
-    test_y = test[:, -1].astype(int)
-
-    clf.fit(train_x, train_y)
-
-    lst = clf.predict(test_x)
-    lst[lst == 1] = 0
-    lst[lst == -1] = 1
-
-    Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
-    Precision.insert(len(Precision), precision_score(test_y, lst))
-    Recall.insert(len(Recall), recall_score(test_y, lst))
-    F1.insert(len(F1), f1_score(test_y, lst))
-
-    results.write(
-        str(run) + ',' + str(accuracy_score(test_y, lst) * 100) + ',' + str(precision_score(test_y, lst)) + ',' + str(
-            recall_score(test_y, lst)) + ',' + str(f1_score(test_y, lst)) + '\n')
-
-results.write(
-    'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
-        np.mean(F1)) + '\n')
-results.close()
-######################################################################################################################################
-# All patients
-os.makedirs(os.path.join(output_path, 'All'), exist_ok=True)
-results = open(os.path.join(output_path, 'All', 'Results.csv'), 'w')
-results.write('Cross-Validation,Accuracy,Precision,Recall,F1\n')
-
-cv = 0
-kf = KFold(n_splits=5)
-Accuracy = []
-Precision = []
-Recall = []
-F1 = []
-for train_indices, test_indices in kf.split(AllPatientIDs):
-    print('All\tCV: ' + str(cv))
-
-    train = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in train_indices])].drop(columns=['PatientID']).to_numpy()
-    train_x = train[:, :-1]
-    train_y = train[:, -1].astype(int)
-
-    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
-    test_x = test[:, :-1]
-    test_y = test[:, -1].astype(int)
-
-    clf.fit(train_x, train_y)
-
-    lst = clf.predict(test_x)
-    lst[lst == 1] = 0
-    lst[lst == -1] = 1
-
-    Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
-    Precision.insert(len(Precision), precision_score(test_y, lst))
-    Recall.insert(len(Recall), recall_score(test_y, lst))
-    F1.insert(len(F1), f1_score(test_y, lst))
-
-    results.write(
-        str(cv) + ',' + str(accuracy_score(test_y, lst) * 100) + ',' + str(precision_score(test_y, lst)) + ',' + str(
-            recall_score(test_y, lst)) + ',' + str(f1_score(test_y, lst)) + '\n')
-
-    cv += 1
-
-results.write(
-    'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
-        np.mean(F1)) + '\n')
-results.close()
-######################################################################################################################################
-# Most
-os.makedirs(os.path.join(output_path, 'Most'), exist_ok=True)
-results = open(os.path.join(output_path, 'Most', 'Results.csv'), 'w')
-results.write('Cross-Validation,Accuracy,Precision,Recall,F1\n')
-
-cv = 0
-kf = KFold(n_splits=5)
-Accuracy = []
-Precision = []
-Recall = []
-F1 = []
-
-# train = AllPatientsData[MoreVulnerablePatientIDs]
-train = AllPatientsData[AllPatientsData['PatientID'].isin(MoreVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
-train_x = train[:, :-1]
-train_y = train[:, -1].astype(int)
-
-clf.fit(train_x, train_y)
-
-for train_indices, test_indices in kf.split(AllPatientIDs):
-    print('More\tCV: ' + str(cv))
-    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
-    test_x = test[:, :-1]
-    test_y = test[:, -1].astype(int)
-
-    lst = clf.predict(test_x)
-    lst[lst == 1] = 0
-    lst[lst == -1] = 1
-
-    Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
-    Precision.insert(len(Precision), precision_score(test_y, lst))
-    Recall.insert(len(Recall), recall_score(test_y, lst))
-    F1.insert(len(F1), f1_score(test_y, lst))
-
-    results.write(
-        str(cv) + ',' + str(accuracy_score(test_y, lst) * 100) + ',' + str(precision_score(test_y, lst)) + ',' + str(
-            recall_score(test_y, lst)) + ',' + str(f1_score(test_y, lst)) + '\n')
-
-    cv += 1
-
-results.write(
-    'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
-        np.mean(F1)) + '\n')
-results.close()
-######################################################################################################################################
-# Least
-os.makedirs(os.path.join(output_path, 'Least'), exist_ok=True)
-results = open(os.path.join(output_path, 'Least', 'Results.csv'), 'w')
-results.write('Cross-Validation,Accuracy,Precision,Recall,F1\n')
-
-cv = 0
-kf = KFold(n_splits=5)
-Accuracy = []
-Precision = []
-Recall = []
-F1 = []
-
-train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
-train_x = train[:, :-1]
-train_y = train[:, -1].astype(int)
-
-clf.fit(train_x, train_y)
-
-for train_indices, test_indices in kf.split(AllPatientIDs):
-    print('Less\tCV: ' + str(cv))
-    test = AllPatientsData[AllPatientsData['PatientID'].isin([AllPatientIDs[i] for i in test_indices])].drop(columns=['PatientID']).to_numpy()
-    test_x = test[:, :-1]
-    test_y = test[:, -1].astype(int)
-
-    lst = clf.predict(test_x)
-    lst[lst == 1] = 0
-    lst[lst == -1] = 1
-
-    Accuracy.insert(len(Accuracy), accuracy_score(test_y, lst) * 100)
-    Precision.insert(len(Precision), precision_score(test_y, lst))
-    Recall.insert(len(Recall), recall_score(test_y, lst))
-    F1.insert(len(F1), f1_score(test_y, lst))
-
-    results.write(
-        str(cv) + ',' + str(accuracy_score(test_y, lst) * 100) + ',' + str(precision_score(test_y, lst)) + ',' + str(
-            recall_score(test_y, lst)) + ',' + str(f1_score(test_y, lst)) + '\n')
-
-    cv += 1
-
-results.write(
-    'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
-        np.mean(F1)) + '\n')
-results.close()
-######################################################################################################################################
+#     'Average,' + str(np.mean(Accuracy)) + ',' + str(np.mean(Precision)) + ',' + str(np.mean(Recall)) + ',' + str(
