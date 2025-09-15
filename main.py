@@ -53,6 +53,7 @@ for x in tqdm(itertools.permutations(numbers)):
 
     if model.linkage[-1][2] < dist:
         dist = model.linkage[-1][2]
+        print('Minimum Distance so far:' + str(dist))
         model.plot(os.path.join(out_dir, "clusters.pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
 
     i += 1
