@@ -46,7 +46,7 @@ for x in itertools.permutations(numbers):
 
     ds = dtw.distance_matrix_fast(ts, compact = True)
     print(type(ds))
-    print(ds.shape)
+    print(ds)
 
     # You can also pass keyword arguments identical to instantiate a Hierarchical object
     model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
