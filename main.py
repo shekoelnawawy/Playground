@@ -11,7 +11,7 @@ import os
 base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data/risk_profiling'
 # base_dir = '/Users/nawawy/Desktop/Research/OhioT1DM_data/risk_profiling'
 data_dir = os.path.join(base_dir, 'Data')
-out_dir = os.path.join(base_dir, 'cluster_outputs')
+out_dir = os.path.join(base_dir, 'cluster_outputs2')
 os.makedirs(out_dir, exist_ok=True)
 
 years = ['2018', '2020']
