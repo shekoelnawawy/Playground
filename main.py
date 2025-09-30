@@ -51,10 +51,10 @@ for x in itertools.permutations(numbers):
     model = clustering.HierarchicalTree(dists_fun=dtw.distance_matrix_fast, dists_options={})
     cluster_idx = model.fit(ts)
 
-    if model.linkage[-1][2] < dist:
-        dist = model.linkage[-1][2]
-        print('Minimum Distance so far:' + str(dist))
-        model.plot(os.path.join(out_dir, "clusters.pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
+    # if model.linkage[-1][2] < dist:
+    dist = model.linkage[-1][2]
+    print('Minimum Distance so far:' + str(dist))
+    model.plot(os.path.join(out_dir, "clusters_"+str(i)+".pdf"), ts_label_margin = -200, show_ts_label=lb, show_tr_label=True)
 
     i += 1
 
