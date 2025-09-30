@@ -31,9 +31,12 @@ for year in years:
 
 numbers = []
 labels = []
-for i in range(len(patients_2018)+len(patients_2020)):
+for i in range(len(patients_2018)):
     numbers.append(i)
-    labels.append("p"+str(i))
+    labels.append("A_" + str(i))
+for i in range(len(patients_2020)):
+    numbers.append(i)
+    labels.append("B_" + str(i))
 
 i=0
 dist = math.inf
