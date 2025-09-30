@@ -58,7 +58,7 @@ for x in itertools.permutations(numbers):
     # if model.linkage[-1][2] < dist:
     dist = model.linkage[-1][2]
     print('Minimum Distance so far:' + str(dist))
-    model.plot(os.path.join(out_dir, "clusters_"+str(i)+".pdf"), ts_label_margin = -500, show_ts_label=lb, show_tr_label=True)
+    model.plot(os.path.join(out_dir, "clusters_"+str(i)+".pdf"), ts_label_margin = -400, show_ts_label=lb, show_tr_label=True)
 
     i += 1
 
