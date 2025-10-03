@@ -4,8 +4,8 @@ from sklearn.svm import OneClassSVM
 import joblib
 import time
 
-# base_dir = '/home/mnawawy/Downloads/MIMIC/processed_data/risk_profiling'
-base_dir = '/Users/nawawy/Desktop/Research/MIMIC_data'
+base_dir = '/home/mnawawy/Downloads/MIMIC/processed_data/risk_profiling'
+# base_dir = '/Users/nawawy/Desktop/Research/MIMIC_data'
 data_dir = os.path.join(base_dir, 'DataOld')
 
 neigh = KNeighborsClassifier(n_neighbors=3)
