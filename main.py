@@ -71,4 +71,4 @@ elapsed_time_less = end_time - start_time
 print(f"Less Vulnerable Elapsed Time: {elapsed_time_less:.6f} seconds")
 
 ######################################################################################################################################
-print('Percentage Decrease kNN = '+str(((elapsed_time_all-elapsed_time_less)/elapsed_time_all)*100))
+print('Percentage Decrease One-Class SVM = '+str(((elapsed_time_all-elapsed_time_less)/elapsed_time_all)*100))
