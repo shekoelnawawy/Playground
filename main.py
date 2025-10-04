@@ -5,19 +5,27 @@ import joblib
 import time
 import numpy as np
 
-base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data'
-# base_dir = '/Users/nawawy/Desktop/Research/OhioT1DM_data'
-data_dir = os.path.join(base_dir, 'training_subsets')
+base_dir = '/home/mnawawy/Sepsis'
+# base_dir = '/Users/nawawy/Desktop/Research/Sepsis_data'
 
-neigh = KNeighborsClassifier(n_neighbors=7)
-clf = OneClassSVM(gamma='auto')#, kernel='sigmoid', coef0=10)
+AllPatientsData = joblib.load(os.path.join(base_dir, 'results', 'attack_outputs', 'adversarial_data.pkl'))
+
+neigh = KNeighborsClassifier(n_neighbors=3)
+clf = OneClassSVM(gamma='scale', kernel='linear', verbose=True)
+
+AllPatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'AllPatientIDs.pkl'))
+MostVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_10', 'MostVulnerablePatientIDs.pkl'))
+MoreVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_5', 'MoreVulnerablePatientIDs.pkl'))
+LessVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluster_outputs', 'benign_data_adv_outputs', 'threshold_5', 'LessVulnerablePatientIDs.pkl'))
+
+
 
 print('kNN')
 ######################################################################################################################################
 # All patients
-train = np.load(data_dir+'/ohiot1dm_train_all_0.npy')
+train = AllPatientsData.drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
-train_y = train[:, -1]
+train_y = train[:, -1].astype(int)
 
 start_time = time.perf_counter()
 neigh.fit(train_x, train_y)
@@ -26,9 +34,9 @@ elapsed_time_all = end_time - start_time
 print(f"All Patients Elapsed Time: {elapsed_time_all:.6f} seconds")
 ######################################################################################################################################
 # Least
-train = np.load(data_dir+'/ohiot1dm_train_least_0.npy')
+train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
-train_y = train[:, -1]
+train_y = train[:, -1].astype(int)
 start_time = time.perf_counter()
 neigh.fit(train_x, train_y)
 end_time = time.perf_counter()
@@ -41,21 +49,21 @@ print('------------------------------------------------------')
 print('One-Class SVM')
 ######################################################################################################################################
 # All patients
-train = np.load(data_dir+'/ohiot1dm_train_all_0.npy')
+train = AllPatientsData.drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
-train_y = train[:, -1]
+train_y = train[:, -1].astype(int)
 start_time = time.perf_counter()
-clf.fit(train_x)
+clf.fit(train_x, train_y)
 end_time = time.perf_counter()
 elapsed_time_all = end_time - start_time
 print(f"All Patients Elapsed Time: {elapsed_time_all:.6f} seconds")
 ######################################################################################################################################
 # Least
-train = np.load(data_dir+'/ohiot1dm_train_least_0.npy')
+train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
-train_y = train[:, -1]
+train_y = train[:, -1].astype(int)
 start_time = time.perf_counter()
-clf.fit(train_x)
+clf.fit(train_x, train_y)
 end_time = time.perf_counter()
 elapsed_time_less = end_time - start_time
 print(f"Less Vulnerable Elapsed Time: {elapsed_time_less:.6f} seconds")
