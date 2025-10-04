@@ -10,7 +10,7 @@ base_dir = '/home/mnawawy/Downloads/OhioT1DM/processed_data'
 data_dir = os.path.join(base_dir, 'training_subsets')
 
 neigh = KNeighborsClassifier(n_neighbors=7)
-clf = OneClassSVM(gamma='auto', kernel='sigmoid', coef0=10)
+clf = OneClassSVM(gamma='auto')#, kernel='sigmoid', coef0=10)
 
 print('kNN')
 ######################################################################################################################################
