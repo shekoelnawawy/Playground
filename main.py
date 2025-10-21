@@ -22,51 +22,50 @@ LessVulnerablePatientIDs = joblib.load(os.path.join(base_dir, 'results', 'cluste
 
 print('kNN')
 ######################################################################################################################################
-# All patients
-train = AllPatientsData.drop(columns=['PatientID']).to_numpy()
-train_x = train[:, :-1]
-train_y = train[:, -1].astype(int)
-
-start_time = time.perf_counter()
-neigh.fit(train_x, train_y)
-end_time = time.perf_counter()
-elapsed_time_all = end_time - start_time
-print(f"All Patients Elapsed Time: {elapsed_time_all:.6f} seconds")
-######################################################################################################################################
 # Least
 train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
-start_time = time.perf_counter()
+start_train_time = time.perf_counter()
 neigh.fit(train_x, train_y)
-end_time = time.perf_counter()
-elapsed_time_less = end_time - start_time
-print(f"Less Vulnerable Elapsed Time: {elapsed_time_less:.6f} seconds")
+end_train_time = time.perf_counter()
+elapsed_train_time = end_train_time - start_train_time
+print(f"Total Training Time: {elapsed_train_time:.6f} seconds")
 
+test = AllPatientsData[AllPatientsData['PatientID'].isin(AllPatientIDs)].drop(columns=['PatientID']).to_numpy()
+test_x = test[:, :-1]
+test_y = test[:, -1].astype(int)
+
+start_test_time = time.perf_counter()
+lst = neigh.predict(test_x)
+end_test_time = time.perf_counter()
+elapsed_test_time = end_test_time - start_test_time
+print(f"Inference Time per instance: {elapsed_test_time/len(test):.6f} seconds")
 ######################################################################################################################################
-print('Percentage Decrease kNN = '+str(((elapsed_time_all-elapsed_time_less)/elapsed_time_all)*100))
+
 print('------------------------------------------------------')
 print('One-Class SVM')
 ######################################################################################################################################
-# All patients
-train = AllPatientsData.drop(columns=['PatientID']).to_numpy()
-train_x = train[:, :-1]
-train_y = train[:, -1].astype(int)
-start_time = time.perf_counter()
-clf.fit(train_x, train_y)
-end_time = time.perf_counter()
-elapsed_time_all = end_time - start_time
-print(f"All Patients Elapsed Time: {elapsed_time_all:.6f} seconds")
-######################################################################################################################################
 # Least
 train = AllPatientsData[AllPatientsData['PatientID'].isin(LessVulnerablePatientIDs)].drop(columns=['PatientID']).to_numpy()
 train_x = train[:, :-1]
 train_y = train[:, -1].astype(int)
-start_time = time.perf_counter()
+start_train_time = time.perf_counter()
 clf.fit(train_x, train_y)
-end_time = time.perf_counter()
-elapsed_time_less = end_time - start_time
-print(f"Less Vulnerable Elapsed Time: {elapsed_time_less:.6f} seconds")
+end_train_time = time.perf_counter()
+elapsed_train_time = end_train_time - start_train_time
+print(f"Total Training Time: {elapsed_train_time:.6f} seconds")
+
+test = AllPatientsData[AllPatientsData['PatientID'].isin(AllPatientIDs)].drop(columns=['PatientID']).to_numpy()
+test_x = test[:, :-1]
+test_y = test[:, -1].astype(int)
+
+start_test_time = time.perf_counter()
+lst = clf.predict(test_x)
+end_test_time = time.perf_counter()
+elapsed_test_time = end_test_time - start_test_time
+print(f"Inference Time per instance: {elapsed_test_time/len(test):.6f} seconds")
+lst[lst == 1] = 0
+lst[lst == -1] = 1
 
 ######################################################################################################################################
-print('Percentage Decrease One-Class SVM = '+str(((elapsed_time_all-elapsed_time_less)/elapsed_time_all)*100))
