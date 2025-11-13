@@ -25,8 +25,7 @@ for file_path in base_dir.rglob("*data/*.pkl"):
         # except Exception as e:
         #     print(f"❌ Failed to load: {e}")
     else:
-        print(type(file_path))
-        if "2018" in file_path:
+        if "2018" in str(file_path):
             shutil.copyfile(file_path, os.path.join(base_dir, "drift", "patient", "2018data"))
-        elif "2020" in file_path:
+        elif "2020" in str(file_path):
             shutil.copyfile(file_path, os.path.join(base_dir, "drift", "patient", "2020data"))
