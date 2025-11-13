@@ -17,7 +17,7 @@ for file_path in base_dir.rglob("*data/*.pkl"):
             obj['glucose'][math.floor(len(obj) * 0.7):] += np.random.randint(low=20, high=30, size=len(obj['glucose'][math.floor(len(obj) * 0.7):]))
             if "2018" in str(file_path):
                 dst_path = Path(os.path.join(base_dir, "drift", "patient", "2018data", file_path.name))
-                print(obj)
+                print(type(obj))
                 exit(1)
                 joblib.dump(obj)
             elif "2020" in str(file_path):
