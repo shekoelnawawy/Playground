@@ -9,7 +9,7 @@ base_dir = Path("/home/mnawawy/Downloads/OhioT1DM/processed_data/")
 os.makedirs(os.path.join(base_dir, "drift", "patient", "2018data"), exist_ok=True)
 os.makedirs(os.path.join(base_dir, "drift", "patient", "2020data"), exist_ok=True)
 
-for file_path in base_dir.rglob("*data/*.pkl"):
+for file_path in base_dir.rglob("/*data/*.pkl"):
     if file_path.name.endswith(".test.pkl"):
         print(f"\n🔍 Checking: {file_path}")
         # try:
