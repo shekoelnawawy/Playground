@@ -5,10 +5,9 @@ import numpy as np
 from pathlib import Path
 
 base_dir = Path("/home/mnawawy/Downloads/OhioT1DM/processed_data/")
-years = ["2020data", "2018data"]
 
-for src_dir in base_dir.rglob("*data"):
-    for file_path in src_dir.rglob("*.pkl"):
+for file_path in base_dir.rglob("*data/*.pkl"):
+    # for file_path in src_dir.rglob("*.pkl"):
         if file_path.name.endswith(".test.pkl"):
             print(f"\n🔍 Checking: {file_path}")
             # try:
@@ -23,3 +22,5 @@ for src_dir in base_dir.rglob("*data"):
             #
             # except Exception as e:
             #     print(f"❌ Failed to load: {e}")
+        else:
+
