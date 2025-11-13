@@ -8,7 +8,7 @@ base_dir = Path("/home/mnawawy/Downloads/OhioT1DM/processed_data/")
 years = ["2020data", "2018data"]
 
 for src_dir in base_dir.rglob("*data"):
-    print("hi")
+    print(src_dir)
 exit(1)
 # src_dir = Path(os.path.join(base_dir,))
 # dst_dir =
