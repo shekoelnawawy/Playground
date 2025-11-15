@@ -22,7 +22,7 @@ for item_path in base_dir.rglob("*"):
             if file_path.name.endswith("dynamic.csv"):
                 try:
                     df = pd.read_csv(file_path, header=1)
-                    print(df)
+                    print(df["224751"])
                     exit(1)
                     df.loc[math.floor(len(df) * indexer):, "glucose"] += np.random.randint(low=20, high=30, size=len(df['glucose'][math.floor(len(df) * indexer):]))
                     if "2018" in str(file_path):
