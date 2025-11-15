@@ -24,15 +24,15 @@ for item_path in base_dir.rglob("*"):
                     df = pd.read_csv(file_path)
                     print(df)
                     exit(1)
-            #         df.loc[math.floor(len(df) * indexer):, "glucose"] += np.random.randint(low=20, high=30, size=len(df['glucose'][math.floor(len(df) * indexer):]))
-            #         if "2018" in str(file_path):
-            #             dst_path = Path(os.path.join(base_dir, "drift", "patient", "2018data", file_path.name))
-            #             joblib.dump(df, dst_path)
-            #         elif "2020" in str(file_path):
-            #             dst_path = Path(os.path.join(base_dir, "drift", "patient", "2020data", file_path.name))
-            #             joblib.dump(df, dst_path)
-            #     except Exception as e:
-            #         print(f"Failed to load: {e}")
+                    df.loc[math.floor(len(df) * indexer):, "glucose"] += np.random.randint(low=20, high=30, size=len(df['glucose'][math.floor(len(df) * indexer):]))
+                    if "2018" in str(file_path):
+                        dst_path = Path(os.path.join(base_dir, "drift", "patient", "2018data", file_path.name))
+                        joblib.dump(df, dst_path)
+                    elif "2020" in str(file_path):
+                        dst_path = Path(os.path.join(base_dir, "drift", "patient", "2020data", file_path.name))
+                        joblib.dump(df, dst_path)
+                except Exception as e:
+                    print(f"Failed to load: {e}")
             # else:
             #     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
             #     if file_path.resolve() != dst_path.resolve():
