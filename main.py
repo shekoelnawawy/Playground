@@ -29,6 +29,7 @@ for item_path in base_dir.rglob("*"):
                     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
 
                     old_header = df.columns.tolist()  # save header as a list
+                    print(old_header)
                     df = pd.concat([pd.DataFrame([old_header]), df], ignore_index=True)
                     print(df)
                     exit(1)
