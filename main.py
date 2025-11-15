@@ -21,7 +21,7 @@ for item_path in base_dir.rglob("*"):
         for file_path in base_dir.rglob("*.csv"):
             if file_path.name.endswith("dynamic.csv"):
                 try:
-                    df_columns = pd.read_csv(file_path, nrows=1)
+                    df_columns = pd.read_csv(file_path, header=None, nrows=1)
                     print(df_columns)
                     exit(1)
                     df = pd.read_csv(file_path, header=1)
