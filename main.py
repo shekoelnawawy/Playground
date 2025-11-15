@@ -32,7 +32,7 @@ for item_path in base_dir.rglob("*"):
 
                     df = pd.concat([df_columns, pd.DataFrame([old_header]), df], ignore_index=True)
 
-                    df.to_csv(dst_path, header=True,index=False)
+                    df.to_csv(dst_path, header=False,index=False)
                     exit(1)
                 except Exception as e:
                     print(f"Failed to load: {e}")
