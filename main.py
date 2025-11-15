@@ -33,7 +33,7 @@ for item_path in base_dir.rglob("*"):
 
                     df.columns = range(df.shape[1])
                     print(df)
-                    df = pd.concat([pd.DataFrame([old_header]), df], ignore_index=True)
+                    df = pd.concat([df_columns, pd.DataFrame([old_header]), df], ignore_index=True)
                     df.columns = range(df.shape[1])
                     print(df)
                     exit(1)
