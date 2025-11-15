@@ -23,8 +23,9 @@ for item_path in base_dir.rglob("*"):
                 try:
                     df_columns = pd.read_csv(file_path, header=None, nrows=1)
                     print(df_columns)
-                    exit(1)
                     df = pd.read_csv(file_path, header=1)
+                    print(df)
+                    exit(1)
                     df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
                     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
 
