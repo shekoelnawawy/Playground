@@ -23,11 +23,14 @@ for item_path in base_dir.rglob("*"):
                 try:
                     df_columns = pd.read_csv(file_path, header=None, nrows=1)
                     df = pd.read_csv(file_path, header=1)
-                    df_no_header = df.reset_index(drop=True)
-                    print(df_no_header)
-                    exit(1)
+
                     df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
                     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
+
+                    old_header = df.columns.tolist()  # save header as a list
+                    df = pd.concat([df_columns, pd.DataFrame([old_header]), df], ignore_index=True)
+                    print(df)
+                    exit(1)
 
                 except Exception as e:
                     print(f"Failed to load: {e}")
@@ -35,3 +38,13 @@ for item_path in base_dir.rglob("*"):
                 dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
                 if file_path.resolve() != dst_path.resolve():
                     shutil.copyfile(file_path, dst_path)
+
+
+# Suppose df is your existing dataframe
+old_header = df.columns.tolist()       # save header as a list
+
+# Insert header list as the first row
+
+
+# Remove the header by renaming columns to generic names
+df.columns = range(df.shape[1])
