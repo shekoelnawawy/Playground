@@ -22,19 +22,16 @@ for item_path in base_dir.rglob("*"):
             if file_path.name.endswith("dynamic.csv"):
                 try:
                     df_columns = pd.read_csv(file_path, header=None, nrows=1)
-                    print(df_columns)
                     df = pd.read_csv(file_path, header=1)
-                    print(df)
                     df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
                     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
 
                     old_header = df.columns.tolist()  # save header as a list
-                    print(pd.DataFrame([old_header]))
 
                     df.columns = range(df.shape[1])
-                    print(df)
+
                     df = pd.concat([df_columns, pd.DataFrame([old_header]), df], ignore_index=True)
-                    df.columns = range(df.shape[1])
+
                     print(df)
                     exit(1)
                 except Exception as e:
