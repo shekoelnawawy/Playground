@@ -18,11 +18,10 @@ for item_path in base_dir.rglob("*"):
         directory_name = item_path.name
         os.makedirs(os.path.join(out_dir, directory_name), exist_ok=True)
 
-        for file_path in base_dir.rglob("*.csv"):
-            if file_path.name.endswith("dynamic.csv"):
+        for file_path in item_path.rglob("*.csv"):
+            dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
+            if dst_path.name.endswith("dynamic.csv"):
                 try:
-                    dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
-
                     df_columns = pd.read_csv(file_path, header=None, nrows=1)
 
                     df = pd.read_csv(file_path, header=1)
@@ -37,6 +36,5 @@ for item_path in base_dir.rglob("*"):
                 except Exception as e:
                     print(f"Failed to load: {e}")
             else:
-                dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
                 if file_path.resolve() != dst_path.resolve():
                     shutil.copyfile(file_path, dst_path)
