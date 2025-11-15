@@ -21,32 +21,22 @@ for item_path in base_dir.rglob("*"):
         for file_path in base_dir.rglob("*.csv"):
             if file_path.name.endswith("dynamic.csv"):
                 try:
-                    df_columns = pd.read_csv(file_path, header=None, nrows=1)
-                    df = pd.read_csv(file_path, header=1)
-                    df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
                     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
 
-                    old_header = df.columns.tolist()  # save header as a list
+                    df_columns = pd.read_csv(file_path, header=None, nrows=1)
 
+                    df = pd.read_csv(file_path, header=1)
+                    df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
+
+                    feature_numbers = df.columns.tolist()  # save header as a list
                     df.columns = range(df.shape[1])
-
-                    df = pd.concat([df_columns, pd.DataFrame([old_header]), df], ignore_index=True)
+                    df = pd.concat([df_columns, pd.DataFrame([feature_numbers]), df], ignore_index=True)
 
                     df.to_csv(dst_path, header=False,index=False)
-                    exit(1)
+
                 except Exception as e:
                     print(f"Failed to load: {e}")
             else:
                 dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
                 if file_path.resolve() != dst_path.resolve():
                     shutil.copyfile(file_path, dst_path)
-
-
-# Suppose df is your existing dataframe
-old_header = df.columns.tolist()       # save header as a list
-
-# Insert header list as the first row
-
-
-# Remove the header by renaming columns to generic names
-df.columns = range(df.shape[1])
