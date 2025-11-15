@@ -21,20 +21,16 @@ for item_path in base_dir.rglob("*"):
         for file_path in base_dir.rglob("*.csv"):
             if file_path.name.endswith("dynamic.csv"):
                 try:
-                    print(file_path)
-                    df = pd.read_csv(file_path, header=1)
-                    print(df["224751"])
+                    df_columns = pd.read_csv(file_path, nrows=1)
+                    print(df_columns)
                     exit(1)
-                    # df.loc[math.floor(len(df) * indexer):, "glucose"] += np.random.randint(low=20, high=30, size=len(df['glucose'][math.floor(len(df) * indexer):]))
-                    # if "2018" in str(file_path):
-                    #     dst_path = Path(os.path.join(base_dir, "drift", "patient", "2018data", file_path.name))
-                    #     joblib.dump(df, dst_path)
-                    # elif "2020" in str(file_path):
-                    #     dst_path = Path(os.path.join(base_dir, "drift", "patient", "2020data", file_path.name))
-                    #     joblib.dump(df, dst_path)
+                    df = pd.read_csv(file_path, header=1)
+                    df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
+                    dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
+
                 except Exception as e:
                     print(f"Failed to load: {e}")
-            # else:
-            #     dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
-            #     if file_path.resolve() != dst_path.resolve():
-            #         shutil.copyfile(file_path, dst_path)
+            else:
+                dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
+                if file_path.resolve() != dst_path.resolve():
+                    shutil.copyfile(file_path, dst_path)
