@@ -30,10 +30,14 @@ for item_path in base_dir.rglob("*"):
 
                     old_header = df.columns.tolist()  # save header as a list
                     print(pd.DataFrame([old_header]))
+
+                    df.columns = range(df.shape[1])
+                    print(df)
+
+                    exit(1)
                     df = pd.concat([pd.DataFrame([old_header]), df], ignore_index=True)
                     df.columns = range(df.shape[1])
                     print(df)
-                    exit(1)
 
                 except Exception as e:
                     print(f"Failed to load: {e}")
