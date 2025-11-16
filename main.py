@@ -1,4 +1,3 @@
-import joblib
 import math
 import os
 import shutil
@@ -9,8 +8,8 @@ from pathlib import Path
 percent_drift = 30
 indexer = (100-percent_drift)/100
 
-base_dir = Path("/home/mnawawy/Downloads/MIMIC/original/data/csv")
-out_dir = Path("/home/mnawawy/Downloads/MIMIC/processed_data/drift/patient")
+base_dir = Path("~/Downloads/Sepsis/files/challenge-2019/1.0.0/training")
+out_dir = Path("/home/mnawawy/Downloads/Sepsis/processed_data/drift/patient")
 os.makedirs(out_dir, exist_ok=True)
 
 for item_path in base_dir.rglob("*"):
@@ -18,20 +17,13 @@ for item_path in base_dir.rglob("*"):
         directory_name = item_path.name
         os.makedirs(os.path.join(out_dir, directory_name), exist_ok=True)
 
-        for file_path in item_path.rglob("*.csv"):
+        for file_path in item_path.rglob("*"):
             dst_path = Path(os.path.join(out_dir, directory_name, file_path.name))
-            if dst_path.name.endswith("dynamic.csv"):
+            if dst_path.name.endswith("*.psv"):
                 try:
-                    df_columns = pd.read_csv(file_path, header=None, nrows=1)
-
-                    df = pd.read_csv(file_path, header=1)
-                    df.loc[math.floor(len(df) * indexer):, "224751"] += np.random.randint(low=20, high=30, size=len(df["224751"][math.floor(len(df) * indexer):]))
-
-                    feature_numbers = df.columns.tolist()  # save header as a list
-                    df.columns = range(df.shape[1])
-                    df = pd.concat([df_columns, pd.DataFrame([feature_numbers]), df], ignore_index=True)
-
-                    df.to_csv(dst_path, header=False,index=False)
+                    df = pd.read_csv(file_path, sep='|')
+                    df.loc[math.floor(len(df) * indexer):, "HR"] += np.random.randint(low=20, high=30, size=len(df["HR"][math.floor(len(df) * indexer):]))
+                    df.to_csv(dst_path, index=False, sep='|')
 
                 except Exception as e:
                     print(f"Failed to load: {e}")
