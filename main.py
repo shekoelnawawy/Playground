@@ -9,7 +9,9 @@ percent_drift = 30
 indexer = (100-percent_drift)/100
 
 base_dir = Path("~/Downloads/Sepsis/files/challenge-2019/1.0.0/training")
-out_dir = Path("/home/mnawawy/Downloads/Sepsis/processed_data/drift/patient")
+# out_dir = Path("/home/mnawawy/Downloads/Sepsis/processed_data/drift/patient")
+out_dir = Path("/home/mnawawy/SepsisDrift")
+
 os.makedirs(out_dir, exist_ok=True)
 
 for item_path in base_dir.rglob("*"):
