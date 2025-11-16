@@ -14,6 +14,8 @@ out_dir = Path("/home/mnawawy/SepsisDrift")
 
 os.makedirs(out_dir, exist_ok=True)
 
+shutil.copyfile(Path(base_dir / 'index.html'), Path(out_dir) / 'index.html')
+
 for item_path in base_dir.rglob("*"):
     if item_path.is_dir():  # Check if the item is a directory
         directory_name = item_path.name
